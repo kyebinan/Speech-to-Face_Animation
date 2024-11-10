@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Check if the correct number of arguments is provided
-if [ "$#" -ne 3 ]; then
-    echo "Usage: $0 <input_video> <segment_file> <output_dir>"
+if [ "$#" -ne 4 ]; then
+    echo "Usage: $0 <input_video> <segment_file> <output_dir> <counter>"
     exit 1
 fi
 
@@ -10,20 +10,21 @@ fi
 input_video="$1"
 segment_file="$2"
 output_dir="$3"
+counter="$4"
 
 # Create the output directory if it doesn't exist
 mkdir -p "$output_dir"
 
 # Counter to keep track of segment numbers
-segment_number=1
+segment_number="$counter"
 
 # Loop through each line in the segment file
-while IFS=, read -r start_time end_time; do
-    output_file="${output_dir}/segment_${segment_number}.mp4"
-    echo "Extracting segment ${segment_number}: ${start_time} to ${end_time}"
+while IFS=, read -r start_time duration; do
+    output_file="${output_dir}/biden_${segment_number}.mp4"
+    echo "Extracting segment ${segment_number}: start at ${start_time} for duration ${duration}"
 
-    # Use ffmpeg to extract the segment
-    ffmpeg -i "$input_video" -ss "$start_time" -to "$end_time" -c copy "$output_file" -y
+    # Use ffmpeg to extract the segment with specified start time and duration
+    ffmpeg -i "$input_video" -ss "$start_time" -t "$duration" -c copy "$output_file" -y
 
     echo "Segment ${segment_number} saved as ${output_file}"
     ((segment_number++))
